@@ -2,6 +2,8 @@ import React from "react";
 import categories from "../girls";
 import styled from "@emotion/styled";
 import { useState } from "react";
+import firebase from '../firebase';
+import Uploader from "../Uploader/Uploader";
 
 const Card = styled.div`
   font-size: 1rem;
@@ -14,7 +16,7 @@ const Link = styled.a`
   font-weight: bold;
 `;
 const Label = styled.p`
-  display: inline-block;
+  display: block;
   font-size: 16px;
   line-height: 0.1rem;
   font-weight: bold;
@@ -51,41 +53,51 @@ const Star = styled.button`
 const GirlDetail = ({ selectedGirl, category = "softtek" }) => {
   const girls = categories[category];
   const selected = girls.find(i => i.id === selectedGirl) || girls[0];
-  const getImageId = (selected, id) => {
-    const { photos = [] } = selected;
-    const { length = 0 } = photos;
+  const getPhotos = () => (
+    firebase.storage().ref('images').root.child(`images/${selectedGirl}`).listAll()
+  );
+
+  const getImageId = async (selected, id) => {
+    const photosChidas = await getPhotos();
+    const { items } = photosChidas;
+    const { length = 0 } = items;
     const newId = typeof id === "number" ? id + 1 : 0;
-    // const random = ~~(Math.random() * length);
-    // if (id !== random) return random;
-    // else return getImageId(selected, id);
-    return newId >= length ? 0 : newId;
+    const currentId = newId >= length ? 0 : newId;
+    return currentId;
   };
 
-  const getImage = (selected, imageId = 0) => {
-    const { photos = [] } = selected;
-    const image = photos[imageId];
-    return image;
+  const getImage = async(imageId = 0) => {
+    const photosChidas = await getPhotos();
+    const { items } = photosChidas;
+    let image = '';
+    if (items.length) image = await items[imageId].getDownloadURL();
+    setImage(image);
   };
-  const [imageId, setImageId] = useState(getImageId(selected));
-  const [image, setImage] = useState(getImage(selected, imageId));
+
+  const [imageId, setImageId] = useState(0);
+  const [image, setImage] = useState('');
   const setFavorite = () => {
     console.log("favorite", imageId);
   };
 
   const detalles = selected ? (
     <Card>
+      <div style={{padding: '15px'}} >
+        <Uploader url={`images/${selected.id}`}/>
+      </div>
       <Label>
         <div>
           <Button
-            onClick={() => {
-              setImageId(getImageId(selected, imageId));
-              setImage(getImage(selected, imageId));
+            onClick={async () => {
+              const id = await getImageId(selected, imageId);
+              setImageId(id);
+              getImage(id);
             }}
           >
             &#x21bb;
           </Button>
         </div>
-        <img src={image} alt={selected.name} width="100%" />
+        {image && <img src={image} alt={selected.name} width="100%" />}
         <div>
           <Star onClick={setFavorite}>&#9734;</Star>
         </div>

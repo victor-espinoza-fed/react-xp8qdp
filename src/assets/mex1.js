@@ -123,7 +123,7 @@ const girls = [
     facebook: "Ninel Conde",
     instagram: "Ninel Conde",
     googlePhotos: "Ninel Conde",
-    photos: [""]
+    photos: ["https://firebasestorage.googleapis.com/v0/b/girls-59d4a.appspot.com/o/Ninel%20Conde%2F016696db-e2a6-4a22-8011-66463df9df1b.jpg?alt=media&token=93e9733d-b511-4006-95ce-bd660d1bd0bd"]
   },
   {
     id: "Nashla Aguilar",
@@ -182,7 +182,7 @@ const girls = [
     photos: [""]
   },
   {
-    id: "Paty Cantú",
+    id: "Paty Cantu",
     name: "Paty Cantú",
     facebook: "Paty Cantú",
     instagram: "Paty Cantú",
